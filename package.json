@@ -1,7 +1,7 @@
 {
   "name": "twitter-backend",
   "version": "1.0.0",
-   "type": "module",
+  "type": "module",
   "main": "index.js",
   "author": "Mohit",
   "license": "MIT",
@@ -10,8 +10,8 @@
     "dev": "tsc-watch --onSuccess \"npm start\"",
     "build": " tsc -p ."
   },
-   
   "devDependencies": {
+    "@types/cors": "^2.8.19",
     "tsc-watch": "^7.2.0",
     "typescript": "^5.9.3"
   },
@@ -19,6 +19,7 @@
     "@apollo/server": "^5.2.0",
     "@as-integrations/express4": "^1.1.2",
     "@types/express": "^5.0.6",
+    "body-parser": "^2.2.1",
     "express": "^5.2.1",
     "graphql": "^16.12.0"
   }
