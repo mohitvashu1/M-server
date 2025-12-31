@@ -1,28 +1,41 @@
-import express from 'express';
-import {ApolloServer}  from '@apollo/server';
-import {expressMiddleware} from '@as-integrations/express4';
-import bodyParser from 'body-parser';
+import express from "express";
+import { ApolloServer } from "@apollo/server";
+import { expressMiddleware } from "@as-integrations/express4";
+import cors from "cors";
 
+export async function initServer() {
+  const app = express();
 
-
- export async function initServer() {
-
-    const app =express();
-    app.use(bodyParser.json())
-    const graphqlServer= new ApolloServer({
-  typeDefs :`
-  type Query{
-  sayHello:String
-  }` ,
-  resolvers:{
-    Query:{
-      sayHello:() => `Hello From Mohit To GraphQl Server`
+  const server = new ApolloServer({
+    typeDefs: `
+      type Query {
+        sayHello: String
+      }
+    `,
+    resolvers: {
+      Query: {
+        sayHello: () => "Hello From Mohit To GraphQL Server",
+      },
     },
-  },  
-});
-await graphqlServer.start();
+  });
 
-app.use("/graphql",expressMiddleware(graphqlServer))
-    
-   return app;
+  await server.start();
+
+  const corsOptions = {
+    origin: "*",
+    methods: ["POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  };
+
+
+  app.options("/graphql", cors(corsOptions));
+
+  app.use(
+    "/graphql",
+    cors(corsOptions),
+    express.json(),
+    expressMiddleware(server)
+  );
+
+  return app;
 }
