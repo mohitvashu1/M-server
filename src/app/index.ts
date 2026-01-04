@@ -2,21 +2,22 @@ import express from "express";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@as-integrations/express4";
 import cors from "cors";
+import { User } from "./user/index.js";
 
 export async function initServer() {
   const app = express();
 
   const server = new ApolloServer({
     typeDefs: `
+
+    ${User.types}
       type Query {
-        sayHello: String
-        sayHelloToMe(name:String!):String
+        ${User.queries}
       }
     `,
     resolvers: {
       Query: {
-        sayHello: () => "Hello From Mohit To GraphQL Server",
-        sayHelloToMe:(parent:any,{name}: {name:string}) => `Hey ${name}`          
+       ...User.resolvers.queries,          
         //https://studio.apollographql.com/sandbox/explorer
       },
     },
