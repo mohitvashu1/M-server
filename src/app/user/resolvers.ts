@@ -1,4 +1,31 @@
 import axios from "axios";
+import { prismaClient } from "../../client/db/index.js";
+
+
+interface GoogleTokenResult {
+  iss: string;
+  azp: string;
+  aud: string;
+  sub: string;
+
+  email: string;
+  email_verified: boolean;
+
+  name?: string;
+  picture?: string;
+  given_name?: string;
+  family_name?: string;
+
+  nbf?: number;
+  iat: number;
+  exp: number;
+
+  jti?: string;
+  alg?: string;
+  kid?: string;
+  typ?: string;
+}
+
 
 const queries = {
   verifyGoogleToken: async (
@@ -11,12 +38,27 @@ const queries = {
 
     googleOauthURL.searchParams.set("id_token", token);
 
-    const { data } = await axios.get(googleOauthURL.toString(), {
+    const { data } = await axios.get<GoogleTokenResult>(googleOauthURL.toString(), {
       responseType: "json",
     });
-
-    console.log(data);
-
+    
+     {/*To Check If User already exist or not & if not create one*/}
+     const user = await prismaClient.user.findUnique({
+        where: {email: data.email},
+     });
+    
+      if(!user){
+        await prismaClient.user.create({
+          data:{
+            email:data.email,
+          firstName: data.given_name,
+          lastName:data.given_name,
+          profileImageURL:data.picture,
+          },
+        });
+      }
+    
+ 
     return "OK";
   },
 };
