@@ -1,6 +1,6 @@
 export declare const resolvers: {
     queries: {
-        verifyGoogleToken: (_: any, { token }: {
+        verifyGoogleToken: (parent: any, { token }: {
             token: string;
         }) => Promise<string>;
     };
