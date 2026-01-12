@@ -49,12 +49,12 @@ const queries = {
     
       if(!user){
         await prismaClient.user.create({
-          data:{
-            email:data.email,
-          firstName: data.given_name,
-          lastName:data.given_name,
-          profileImageURL:data.picture,
-          },
+           data: {
+    email: data.email,
+    firstName: data.given_name ?? "User",
+    lastName: data.family_name ?? null,
+    profileImageURL: data.picture ?? null,
+  },
         });
       }
     
