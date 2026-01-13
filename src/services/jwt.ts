@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { prismaClient } from "../client/db/index.js";
 import { JWT_SECRET } from "../config/env.js";
+import type { User } from "@prisma/client";
 
 interface JwtPayload {
   id: string;
@@ -8,19 +9,8 @@ interface JwtPayload {
 }
 
 class JWTServices {
-  public static async generateTokenForUser(userId: string): Promise<string> {
-    const user = await prismaClient.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        email: true,
-      },
-    });
-
-    if (!user) {
-      throw new Error("User not found");
-    }
-
+  public static  generateTokenForUser(user:User) {
+    
     const payload: JwtPayload = {
       id: user.id,
       email: user.email,

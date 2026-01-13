@@ -1,5 +1,6 @@
 import axios from "axios";
 import { prismaClient } from "../../client/db/index.js";
+import JWTServices from "../../services/jwt.js";
 const queries = {
     verifyGoogleToken: async (parent, { token }) => {
         const googleOauthURL = new URL("https://oauth2.googleapis.com/tokeninfo");
@@ -21,7 +22,11 @@ const queries = {
                 },
             });
         }
-        return "OK";
+        const userInDb = await prismaClient.user.findUnique({ where: { email: data.email } });
+        if (!userInDb)
+            throw new Error('User WithEmail not found');
+        const userToken = JWTServices.generateTokenForUser(userInDb);
+        return userToken;
     },
 };
 export const resolvers = { queries };
