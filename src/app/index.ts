@@ -1,4 +1,4 @@
-import express from "express";
+import express from "express"
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@as-integrations/express4";
 import cors from "cors";
@@ -6,6 +6,7 @@ import { User } from "./user/index.js";
 
 export async function initServer() {
   const app = express();
+  app.use(cors());
 
   const server = new ApolloServer({
     typeDefs: `
