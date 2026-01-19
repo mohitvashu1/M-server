@@ -68,7 +68,7 @@ const queries = {
   },
 
   getCurrentUser: async( parent: any, args:any,ctx:GraphqlContext) =>{
-    console.log(ctx);
+    
     const id=ctx.user?.id;
     if(!id) return null;
 

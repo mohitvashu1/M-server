@@ -6,9 +6,9 @@ export declare const resolvers: {
         }) => Promise<string>;
         getCurrentUser: (parent: any, args: any, ctx: GraphqlContext) => Promise<{
             id: string;
-            email: string;
             firstName: string;
             lastName: string | null;
+            email: string;
             profileImageURL: string | null;
             createdAt: Date;
             updatedAt: Date;

@@ -29,7 +29,6 @@ const queries = {
         return userToken;
     },
     getCurrentUser: async (parent, args, ctx) => {
-        console.log(ctx);
         const id = ctx.user?.id;
         if (!id)
             return null;

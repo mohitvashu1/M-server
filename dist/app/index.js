@@ -8,8 +8,7 @@ export async function initServer() {
     const app = express();
     const server = new ApolloServer({
         typeDefs: `
-
-    ${User.types}
+      ${User.types}
       type Query {
         ${User.queries}
       }
@@ -17,7 +16,6 @@ export async function initServer() {
         resolvers: {
             Query: {
                 ...User.resolvers.queries,
-                //https://studio.apollographql.com/sandbox/explorer
             },
         },
     });
@@ -29,12 +27,24 @@ export async function initServer() {
     };
     app.options("/graphql", cors(corsOptions));
     app.use("/graphql", cors(corsOptions), express.json(), expressMiddleware(server, {
-        context: async ({ req, res }) => {
-            return {
-                user: req.headers.authorization
-                    ? JWTServices.decodeToken(req.headers.authorization.split("Bearer ")[1])
-                    : undefined,
-            };
+        context: async ({ req }) => {
+            const authHeader = req.headers.authorization;
+            if (!authHeader) {
+                return { user: null };
+            }
+            try {
+                // Expect: "Bearer <token>"
+                const token = authHeader.split(" ")[1];
+                if (!token)
+                    return { user: null };
+                const user = JWTServices.decodeToken(token); // ONLY your app JWT
+                return { user };
+            }
+            catch (error) {
+                // 👇 CRITICAL: never crash context
+                console.warn("Invalid JWT:", error);
+                return { user: null };
+            }
         },
     }));
     return app;

@@ -8,9 +8,9 @@ export declare const User: {
             }) => Promise<string>;
             getCurrentUser: (parent: any, args: any, ctx: import("../../interface.js").GraphqlContext) => Promise<{
                 id: string;
-                email: string;
                 firstName: string;
                 lastName: string | null;
+                email: string;
                 profileImageURL: string | null;
                 createdAt: Date;
                 updatedAt: Date;

@@ -1,8 +1,8 @@
 export interface JWTUser {
     id: string;
-    email: String;
+    email: string;
 }
 export interface GraphqlContext {
-    user?: JWTUser;
+    user: JWTUser | null;
 }
 //# sourceMappingURL=interface.d.ts.map
