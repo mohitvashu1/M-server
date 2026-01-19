@@ -28,6 +28,14 @@ const queries = {
         const userToken = JWTServices.generateTokenForUser(userInDb);
         return userToken;
     },
+    getCurrentUser: async (parent, args, ctx) => {
+        console.log(ctx);
+        const id = ctx.user?.id;
+        if (!id)
+            return null;
+        const user = await prismaClient.user.findUnique({ where: { id } });
+        return user;
+    },
 };
 export const resolvers = { queries };
 //# sourceMappingURL=resolvers.js.map

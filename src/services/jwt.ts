@@ -1,17 +1,14 @@
 import jwt from "jsonwebtoken";
-import { prismaClient } from "../client/db/index.js";
 import { JWT_SECRET } from "../config/env.js";
 import type { User } from "@prisma/client";
+import type { JWTUser } from "../interface.js";
 
-interface JwtPayload {
-  id: string;
-  email: string;
-}
 
-class JWTServices {
+
+class JWTServices { 
   public static  generateTokenForUser(user:User) {
     
-    const payload: JwtPayload = {
+    const payload: JWTUser = {
       id: user.id,
       email: user.email,
     };
@@ -21,8 +18,9 @@ class JWTServices {
     });
   }
 
-  public static verifyToken(token: string): JwtPayload {
-    return jwt.verify(token, JWT_SECRET) as JwtPayload;
+
+  public static decodeToken(token: string){
+    return jwt.verify(token, JWT_SECRET) as JWTUser;
   }
 }
 

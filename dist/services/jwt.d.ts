@@ -1,11 +1,8 @@
 import type { User } from "@prisma/client";
-interface JwtPayload {
-    id: string;
-    email: string;
-}
+import type { JWTUser } from "../interface.js";
 declare class JWTServices {
     static generateTokenForUser(user: User): string;
-    static verifyToken(token: string): JwtPayload;
+    static decodeToken(token: string): JWTUser;
 }
 export default JWTServices;
 //# sourceMappingURL=jwt.d.ts.map
