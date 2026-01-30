@@ -1,4 +1,7 @@
 import { prismaClient } from "../../client/db/index.js";
+const queries = {
+    getAllTweets: () => prismaClient.tweet.findMany({ orderBy: { createdAt: "desc" } }),
+};
 const mutations = {
     createTweet: async (parent, { payload }, ctx) => {
         if (!ctx.user)
@@ -13,5 +16,14 @@ const mutations = {
         return tweet;
     },
 };
-export const resolvers = { mutations };
+const extraResolvers = {
+    Tweet: {
+        author: (parent) => prismaClient.user.findUnique({ where: { id: parent.authorId } }),
+    },
+};
+export const resolvers = {
+    Query: queries,
+    Mutation: mutations,
+    ...extraResolvers,
+};
 //# sourceMappingURL=resolvers.js.map
