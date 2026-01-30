@@ -4,19 +4,28 @@ import { expressMiddleware } from "@as-integrations/express4";
 import cors from "cors";
 import { User } from "./user/index.js";
 import JWTServices from "../services/jwt.js";
+import { Tweet } from "./tweet/index.js";
 export async function initServer() {
     const app = express();
     const server = new ApolloServer({
         typeDefs: `
       ${User.types}
+      ${Tweet.types}
       type Query {
         ${User.queries}
+      }
+
+      type Mutation{
+      ${Tweet.mutations} 
       }
     `,
         resolvers: {
             Query: {
                 ...User.resolvers.queries,
             },
+            Mutation: {
+                ...Tweet.resolvers.mutations
+            }
         },
     });
     await server.start();
