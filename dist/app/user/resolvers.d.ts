@@ -4,7 +4,26 @@ export declare const resolvers: {
         verifyGoogleToken: (parent: any, { token }: {
             token: string;
         }) => Promise<string>;
-        getCurrentUser: (parent: any, args: any, ctx: GraphqlContext) => Promise<{
+        getCurrentUser: (parent: any, args: any, ctx: GraphqlContext) => Promise<({
+            tweets: ({
+                author: {
+                    id: string;
+                    firstName: string;
+                    lastName: string | null;
+                    email: string;
+                    profileImageURL: string | null;
+                    createdAt: Date;
+                    updatedAt: Date;
+                };
+            } & {
+                id: string;
+                createdAt: Date;
+                updatedAt: Date;
+                content: string;
+                imageURL: string | null;
+                authorId: string;
+            })[];
+        } & {
             id: string;
             firstName: string;
             lastName: string | null;
@@ -12,7 +31,7 @@ export declare const resolvers: {
             profileImageURL: string | null;
             createdAt: Date;
             updatedAt: Date;
-        } | null>;
+        }) | null>;
     };
 };
 //# sourceMappingURL=resolvers.d.ts.map

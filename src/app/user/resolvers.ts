@@ -3,7 +3,6 @@ import { prismaClient } from "../../client/db/index.js";
 import JWTServices from "../../services/jwt.js";
 import type { GraphqlContext } from "../../interface.js";
 
-
 interface GoogleTokenResult {
   iss: string;
   azp: string;
@@ -28,7 +27,6 @@ interface GoogleTokenResult {
   typ?: string;
 }
 
-
 const queries = {
   verifyGoogleToken: async (
     parent: any,
@@ -40,43 +38,56 @@ const queries = {
 
     googleOauthURL.searchParams.set("id_token", token);
 
-    const { data } = await axios.get<GoogleTokenResult>(googleOauthURL.toString(), {
-      responseType: "json",
+    const { data } = await axios.get<GoogleTokenResult>(
+      googleOauthURL.toString(),
+      { responseType: "json" }
+    );
+
+    // Check if user exists
+    let user = await prismaClient.user.findUnique({
+      where: { email: data.email },
     });
-    
-     {/*To Check If User already exist or not & if not create one*/}
-     const user = await prismaClient.user.findUnique({
-        where: {email: data.email},
-     });
-    
-      if(!user){
-        await prismaClient.user.create({
-           data: {
-                    email: data.email,
-                     firstName: data.given_name ?? "User",
-                    lastName: data.family_name ?? null,
-                      profileImageURL: data.picture ?? null,
-                  },
-          });
-      }
 
+    // If not, create
+    if (!user) {
+      user = await prismaClient.user.create({
+        data: {
+          email: data.email,
+          firstName: data.given_name ?? "User",
+          lastName: data.family_name ?? null,
+          profileImageURL: data.picture ?? null,
+        },
+      });
+    }
 
-      const userInDb = await prismaClient.user.findUnique({ where: { email: data.email } });
-          if(!userInDb) throw new Error('User WithEmail not found')
-      const userToken =JWTServices.generateTokenForUser(userInDb)
-          return userToken;
+    const userToken = JWTServices.generateTokenForUser(user);
+    return userToken;
   },
 
-  getCurrentUser: async( parent: any, args:any,ctx:GraphqlContext) =>{
-    
-    const id=ctx.user?.id;
-    if(!id) return null;
+  getCurrentUser: async (
+    parent: any,
+    args: any,
+    ctx: GraphqlContext
+  ) => {
+    const id = ctx.user?.id;
+    if (!id) return null;
 
-    const user =await prismaClient.user.findUnique({where:{id}})
+    const user = await prismaClient.user.findUnique({
+      where: { id },
+      include: {
+        tweets: {
+          include: {
+            author: true,
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+        },
+      },
+    });
+
     return user;
   },
-
-
 };
 
 export const resolvers = { queries };

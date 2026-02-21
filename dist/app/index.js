@@ -49,7 +49,7 @@ export async function initServer() {
                 const token = authHeader.split(" ")[1];
                 if (!token)
                     return { user: null };
-                const user = JWTServices.decodeToken(token); // ONLY your app JWT
+                const user = JWTServices.decodeToken(token);
                 return { user };
             }
             catch (error) {
