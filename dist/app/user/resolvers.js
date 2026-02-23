@@ -35,14 +35,26 @@ const queries = {
                     include: {
                         author: true,
                     },
-                    orderBy: {
-                        createdAt: "desc",
-                    },
                 },
             },
         });
         return user;
     },
+    getUserById: async (parent, { id }, ctx) => prismaClient.user.findUnique({
+        where: { id },
+        include: {
+            tweets: {
+                include: {
+                    author: true,
+                },
+            },
+        },
+    }),
 };
-export const resolvers = { queries };
+const extraResolvers = {
+    User: {
+        tweets: (parent) => prismaClient.tweet.findMany({ where: { id: parent.id } }),
+    },
+};
+export const resolvers = { queries, extraResolvers };
 //# sourceMappingURL=resolvers.js.map
