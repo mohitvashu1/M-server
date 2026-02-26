@@ -1,72 +1,60 @@
-import axios from "axios";
+import UserService from "../../services/user.js";
+import TweetService from "../../services/tweet.js";
 import { prismaClient } from "../../client/db/index.js";
-import JWTServices from "../../services/jwt.js";
 const queries = {
     verifyGoogleToken: async (parent, { token }) => {
-        const googleOauthURL = new URL("https://oauth2.googleapis.com/tokeninfo");
-        googleOauthURL.searchParams.set("id_token", token);
-        const { data } = await axios.get(googleOauthURL.toString(), { responseType: "json" });
-        let user = await prismaClient.user.findUnique({
-            where: { email: data.email },
-        });
-        if (!user) {
-            user = await prismaClient.user.create({
-                data: {
-                    email: data.email,
-                    firstName: data.given_name ?? "User",
-                    lastName: data.family_name ?? "",
-                    profileImageURL: data.picture ?? "",
-                },
-            });
-        }
-        const userToken = JWTServices.generateTokenForUser(user);
-        return userToken;
+        return UserService.verifyGoogleAuthToken(token);
     },
     getCurrentUser: async (parent, args, ctx) => {
         const id = ctx.user?.id;
         if (!id)
             return null;
-        const user = await prismaClient.user.findUnique({
+        return prismaClient.user.findUnique({
             where: { id },
             include: {
                 tweets: {
-                    orderBy: {
-                        createdAt: "desc",
-                    },
-                    include: {
-                        author: true,
-                    },
+                    orderBy: { createdAt: "desc" },
+                    include: { author: true },
                 },
             },
         });
-        return user;
     },
-    getUserById: async (parent, { id }, ctx) => prismaClient.user.findUnique({
-        where: { id },
-        include: {
-            tweets: {
-                orderBy: {
-                    createdAt: "desc",
-                },
-                include: {
-                    author: true,
+    getUserById: async (parent, { id }) => {
+        return prismaClient.user.findUnique({
+            where: { id },
+            include: {
+                tweets: {
+                    orderBy: { createdAt: "desc" },
+                    include: { author: true },
                 },
             },
-        },
-    }),
+        });
+    },
+};
+const mutations = {
+    createTweet: async (parent, { payload }, ctx) => {
+        const userId = ctx.user?.id;
+        if (!userId)
+            throw new Error("Unauthorized");
+        return TweetService.createTweet({
+            content: payload.content,
+            imageURL: payload.imageURL,
+            userId,
+        });
+    },
 };
 const extraResolvers = {
     User: {
         tweets: (parent) => prismaClient.tweet.findMany({
             where: { authorId: parent.id },
-            orderBy: {
-                createdAt: "desc",
-            },
-            include: {
-                author: true,
-            },
+            orderBy: { createdAt: "desc" },
+            include: { author: true },
         }),
     },
 };
-export const resolvers = { queries, extraResolvers };
+export const resolvers = {
+    Query: queries,
+    Mutation: mutations,
+    User: extraResolvers.User,
+};
 //# sourceMappingURL=resolvers.js.map

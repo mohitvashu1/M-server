@@ -1,42 +1,25 @@
-import { prismaClient } from "../../client/db/index.js";
-import { uploadToCloudinary } from "../../services/cloudinary.js";
-const queries = {
+import TweetService from "../../services/tweet.js";
+const Query = {
     getAllTweets: async () => {
-        return prismaClient.tweet.findMany({
-            orderBy: { createdAt: "desc" },
-        });
+        return TweetService.getAllTweets();
     },
 };
-const mutations = {
+const Mutation = {
     createTweet: async (parent, { payload }, ctx) => {
-        if (!ctx.user)
-            throw new Error("You are not authenticated");
-        let uploadedUrl = null;
-        if (payload.imageURL) {
-            uploadedUrl = await uploadToCloudinary(payload.imageURL);
-        }
-        const tweet = await prismaClient.tweet.create({
-            data: {
-                content: payload.content,
-                imageURL: uploadedUrl,
-                author: { connect: { id: ctx.user.id } },
-            },
+        const userId = ctx.user?.id;
+        if (!userId)
+            throw new Error("Unauthorized");
+        return TweetService.createTweet({
+            content: payload.content,
+            imageURL: payload.imageURL,
+            userId,
         });
-        return tweet;
-    }
-};
-const extraResolvers = {
-    Tweet: {
-        author: (parent) => {
-            return prismaClient.user.findUnique({
-                where: { id: parent.authorId },
-            });
-        },
     },
 };
+const TweetType = {};
 export const resolvers = {
-    Query: queries,
-    Mutation: mutations,
-    ...extraResolvers,
+    Query,
+    Mutation,
+    Tweet: TweetType,
 };
 //# sourceMappingURL=resolvers.js.map

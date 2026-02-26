@@ -23,7 +23,7 @@ export async function initServer() {
   `,
         resolvers: {
             Query: {
-                ...User.resolvers.queries,
+                ...User.resolvers.Query,
                 ...Tweet.resolvers.Query,
             },
             Mutation: {

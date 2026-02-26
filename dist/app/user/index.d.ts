@@ -2,7 +2,7 @@ export declare const User: {
     types: string;
     queries: string;
     resolvers: {
-        queries: {
+        Query: {
             verifyGoogleToken: (parent: any, { token }: {
                 token: string;
             }) => Promise<string>;
@@ -36,7 +36,7 @@ export declare const User: {
             }) | null>;
             getUserById: (parent: any, { id }: {
                 id: string;
-            }, ctx: import("../../interface.js").GraphqlContext) => Promise<({
+            }) => Promise<({
                 tweets: ({
                     author: {
                         id: string;
@@ -65,27 +65,45 @@ export declare const User: {
                 updatedAt: Date;
             }) | null>;
         };
-        extraResolvers: {
-            User: {
-                tweets: (parent: import("@prisma/client").User) => import("@prisma/client").Prisma.PrismaPromise<({
-                    author: {
-                        id: string;
-                        firstName: string;
-                        lastName: string | null;
-                        email: string;
-                        profileImageURL: string | null;
-                        createdAt: Date;
-                        updatedAt: Date;
-                    };
-                } & {
+        Mutation: {
+            createTweet: (parent: any, { payload }: any, ctx: import("../../interface.js").GraphqlContext) => Promise<{
+                author: {
                     id: string;
+                    firstName: string;
+                    lastName: string | null;
+                    email: string;
+                    profileImageURL: string | null;
                     createdAt: Date;
                     updatedAt: Date;
-                    content: string;
-                    imageURL: string | null;
-                    authorId: string;
-                })[]>;
-            };
+                };
+            } & {
+                id: string;
+                createdAt: Date;
+                updatedAt: Date;
+                content: string;
+                imageURL: string | null;
+                authorId: string;
+            }>;
+        };
+        User: {
+            tweets: (parent: import("@prisma/client").User) => import("@prisma/client").Prisma.PrismaPromise<({
+                author: {
+                    id: string;
+                    firstName: string;
+                    lastName: string | null;
+                    email: string;
+                    profileImageURL: string | null;
+                    createdAt: Date;
+                    updatedAt: Date;
+                };
+            } & {
+                id: string;
+                createdAt: Date;
+                updatedAt: Date;
+                content: string;
+                imageURL: string | null;
+                authorId: string;
+            })[]>;
         };
     };
 };

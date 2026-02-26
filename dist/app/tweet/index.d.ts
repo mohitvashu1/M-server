@@ -2,44 +2,47 @@ export declare const Tweet: {
     types: string;
     mutations: string;
     resolvers: {
-        Tweet: {
-            author: (parent: import("@prisma/client").Tweet) => import("@prisma/client").Prisma.Prisma__UserClient<{
-                id: string;
-                firstName: string;
-                lastName: string | null;
-                email: string;
-                profileImageURL: string | null;
-                createdAt: Date;
-                updatedAt: Date;
-            } | null, null, import("@prisma/client/runtime/library").DefaultArgs, {
-                log: "query"[];
-            }>;
-        };
         Query: {
-            getAllTweets: () => Promise<{
+            getAllTweets: () => Promise<({
+                author: {
+                    id: string;
+                    createdAt: Date;
+                    updatedAt: Date;
+                    firstName: string;
+                    lastName: string | null;
+                    email: string;
+                    profileImageURL: string | null;
+                };
+            } & {
                 id: string;
-                createdAt: Date;
-                updatedAt: Date;
                 content: string;
                 imageURL: string | null;
                 authorId: string;
-            }[]>;
+                createdAt: Date;
+                updatedAt: Date;
+            })[]>;
         };
         Mutation: {
-            createTweet: (parent: any, { payload }: {
-                payload: {
-                    content: string;
-                    imageURL?: string;
+            createTweet: (parent: any, { payload }: any, ctx: import("../../interface.js").GraphqlContext) => Promise<{
+                author: {
+                    id: string;
+                    createdAt: Date;
+                    updatedAt: Date;
+                    firstName: string;
+                    lastName: string | null;
+                    email: string;
+                    profileImageURL: string | null;
                 };
-            }, ctx: import("../../interface.js").GraphqlContext) => Promise<{
+            } & {
                 id: string;
-                createdAt: Date;
-                updatedAt: Date;
                 content: string;
                 imageURL: string | null;
                 authorId: string;
+                createdAt: Date;
+                updatedAt: Date;
             }>;
         };
+        Tweet: {};
     };
     queries: string;
 };
