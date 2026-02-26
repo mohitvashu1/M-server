@@ -1,9 +1,5 @@
 import type { Tweet } from "@prisma/client";
 import type { GraphqlContext } from "../../interface.js";
-export interface CreateTweetPayload {
-    content: string;
-    imageURL?: string;
-}
 export declare const resolvers: {
     Tweet: {
         author: (parent: Tweet) => import("@prisma/client").Prisma.Prisma__UserClient<{
@@ -19,7 +15,7 @@ export declare const resolvers: {
         }>;
     };
     Query: {
-        getAllTweets: () => import("@prisma/client").Prisma.PrismaPromise<{
+        getAllTweets: () => Promise<{
             id: string;
             createdAt: Date;
             updatedAt: Date;
@@ -30,7 +26,10 @@ export declare const resolvers: {
     };
     Mutation: {
         createTweet: (parent: any, { payload }: {
-            payload: CreateTweetPayload;
+            payload: {
+                content: string;
+                imageURL?: string;
+            };
         }, ctx: GraphqlContext) => Promise<{
             id: string;
             createdAt: Date;

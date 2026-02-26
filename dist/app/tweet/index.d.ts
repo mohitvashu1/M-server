@@ -16,7 +16,7 @@ export declare const Tweet: {
             }>;
         };
         Query: {
-            getAllTweets: () => import("@prisma/client").Prisma.PrismaPromise<{
+            getAllTweets: () => Promise<{
                 id: string;
                 createdAt: Date;
                 updatedAt: Date;
@@ -27,7 +27,10 @@ export declare const Tweet: {
         };
         Mutation: {
             createTweet: (parent: any, { payload }: {
-                payload: import("./resolvers.js").CreateTweetPayload;
+                payload: {
+                    content: string;
+                    imageURL?: string;
+                };
             }, ctx: import("../../interface.js").GraphqlContext) => Promise<{
                 id: string;
                 createdAt: Date;

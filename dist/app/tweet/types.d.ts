@@ -1,2 +1,2 @@
-export declare const types = "#graphql\n\n    input CreateTweetData {\n        content: String!\n        imageURL: String\n    }\n\n    type Tweet {\n        id: ID!\n        content: String!\n        imageURL: String\n\n        author: User\n    }\n";
+export declare const types = "#graphql\n\n    input CreateTweetData {\n        content: String!\n        imageURL: String\n    }\n\n    type Tweet {\n        id: ID!\n        content: String!\n        imageURL: String\n        author: User\n        createdAt: String!\n        updatedAt: String!\n  }\n";
 //# sourceMappingURL=types.d.ts.map

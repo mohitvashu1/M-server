@@ -39,7 +39,7 @@ export async function initServer() {
         allowedHeaders: ["Content-Type", "Authorization"],
     };
     app.options("/graphql", cors(corsOptions));
-    app.use("/graphql", cors(corsOptions), express.json(), expressMiddleware(server, {
+    app.use("/graphql", cors(corsOptions), express.json({ limit: "10mb" }), expressMiddleware(server, {
         context: async ({ req }) => {
             const authHeader = req.headers.authorization;
             if (!authHeader) {

@@ -1,40 +1,49 @@
 import type { Tweet } from "@prisma/client";
 import { prismaClient } from "../../client/db/index.js";
 import type { GraphqlContext } from "../../interface.js";
-
-export interface CreateTweetPayload {
-  content: string;
-  imageURL?: string;
-}
+import { uploadToCloudinary } from "../../services/cloudinary.js";
 
 const queries = {
-  getAllTweets: () =>
-    prismaClient.tweet.findMany({ orderBy: { createdAt: "desc" } }),
+  getAllTweets: async () => {
+    return prismaClient.tweet.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+  },
 };
 
 const mutations = {
   createTweet: async (
-    parent: any,
-    { payload }: { payload: CreateTweetPayload },
-    ctx: GraphqlContext
-  ) => {
-    if (!ctx.user) throw new Error("You are not authenticated");
-    const tweet = await prismaClient.tweet.create({
-      data: {
-        content: payload.content,
-        imageURL: payload.imageURL ?? null,
-        author: { connect: { id: ctx.user.id } },
-      },
-    });
+  parent: any,
+  { payload }: { payload: { content: string; imageURL?: string } },
+  ctx: GraphqlContext
+) => {
+  if (!ctx.user) throw new Error("You are not authenticated");
 
-    return tweet;
-  },
+  let uploadedUrl: string | null = null;
+
+  if (payload.imageURL) {
+    uploadedUrl = await uploadToCloudinary(payload.imageURL);
+  }
+
+  const tweet = await prismaClient.tweet.create({
+    data: {
+      content: payload.content,
+      imageURL: uploadedUrl,
+      author: { connect: { id: ctx.user.id } },
+    },
+  });
+
+  return tweet;
+}
 };
 
 const extraResolvers = {
   Tweet: {
-    author: (parent: Tweet) =>
-      prismaClient.user.findUnique({ where: { id: parent.authorId } }),
+    author: (parent: Tweet) => {
+      return prismaClient.user.findUnique({
+        where: { id: parent.authorId },
+      });
+    },
   },
 };
 

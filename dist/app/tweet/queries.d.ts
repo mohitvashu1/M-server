@@ -1,2 +1,2 @@
-export declare const queries = "#graphql\n    getAllTweets: [Tweet]\n    getSignedURLForTweet(imageName: String!, imageType: String!): String\n";
+export declare const queries = "#graphql\n    getAllTweets: [Tweet!]!\n    \n";
 //# sourceMappingURL=queries.d.ts.map

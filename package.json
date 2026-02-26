@@ -23,6 +23,7 @@
     "@types/express": "^5.0.6",
     "axios": "^1.13.2",
     "body-parser": "^2.2.1",
+    "cloudinary": "^2.9.0",
     "cors": "^2.8.5",
     "express": "^4.22.1",
     "graphql": "^16.12.0",
