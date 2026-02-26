@@ -9,19 +9,15 @@ interface GoogleTokenResult {
   azp: string;
   aud: string;
   sub: string;
-
   email: string;
   email_verified: boolean;
-
   name?: string;
   picture?: string;
   given_name?: string;
   family_name?: string;
-
   nbf?: number;
   iat: number;
   exp: number;
-
   jti?: string;
   alg?: string;
   kid?: string;
@@ -44,19 +40,17 @@ const queries = {
       { responseType: "json" }
     );
 
-    // Check if user exists
     let user = await prismaClient.user.findUnique({
       where: { email: data.email },
     });
 
-    // If not, create
     if (!user) {
       user = await prismaClient.user.create({
         data: {
           email: data.email,
           firstName: data.given_name ?? "User",
-          lastName: data.family_name ?? null,
-          profileImageURL: data.picture ?? null,
+          lastName: data.family_name ?? "",
+          profileImageURL: data.picture ?? "",
         },
       });
     }
@@ -75,8 +69,11 @@ const queries = {
 
     const user = await prismaClient.user.findUnique({
       where: { id },
-    include: {
+      include: {
         tweets: {
+          orderBy: {
+            createdAt: "desc",
+          },
           include: {
             author: true,
           },
@@ -87,30 +84,39 @@ const queries = {
     return user;
   },
 
- getUserById: async (
+  getUserById: async (
     parent: any,
     { id }: { id: string },
     ctx: GraphqlContext
-  ) => prismaClient.user.findUnique({
+  ) =>
+    prismaClient.user.findUnique({
       where: { id },
       include: {
         tweets: {
+          orderBy: {
+            createdAt: "desc",
+          },
           include: {
             author: true,
           },
         },
       },
-}),
+    }),
 };
 
-
-const extraResolvers ={
-  User:{
-    tweets:(parent:User) =>
-      prismaClient.tweet.findMany({where:{id:parent.id}},
-        
-      ),
+const extraResolvers = {
+  User: {
+    tweets: (parent: User) =>
+      prismaClient.tweet.findMany({
+        where: { authorId: parent.id },
+        orderBy: {
+          createdAt: "desc",
+        },
+        include: {
+          author: true,
+        },
+      }),
   },
 };
 
-export const resolvers = { queries ,extraResolvers };
+export const resolvers = { queries, extraResolvers };

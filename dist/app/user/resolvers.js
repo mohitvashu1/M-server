@@ -6,18 +6,16 @@ const queries = {
         const googleOauthURL = new URL("https://oauth2.googleapis.com/tokeninfo");
         googleOauthURL.searchParams.set("id_token", token);
         const { data } = await axios.get(googleOauthURL.toString(), { responseType: "json" });
-        // Check if user exists
         let user = await prismaClient.user.findUnique({
             where: { email: data.email },
         });
-        // If not, create
         if (!user) {
             user = await prismaClient.user.create({
                 data: {
                     email: data.email,
                     firstName: data.given_name ?? "User",
-                    lastName: data.family_name ?? null,
-                    profileImageURL: data.picture ?? null,
+                    lastName: data.family_name ?? "",
+                    profileImageURL: data.picture ?? "",
                 },
             });
         }
@@ -32,6 +30,9 @@ const queries = {
             where: { id },
             include: {
                 tweets: {
+                    orderBy: {
+                        createdAt: "desc",
+                    },
                     include: {
                         author: true,
                     },
@@ -44,6 +45,9 @@ const queries = {
         where: { id },
         include: {
             tweets: {
+                orderBy: {
+                    createdAt: "desc",
+                },
                 include: {
                     author: true,
                 },
@@ -53,7 +57,15 @@ const queries = {
 };
 const extraResolvers = {
     User: {
-        tweets: (parent) => prismaClient.tweet.findMany({ where: { id: parent.id } }),
+        tweets: (parent) => prismaClient.tweet.findMany({
+            where: { authorId: parent.id },
+            orderBy: {
+                createdAt: "desc",
+            },
+            include: {
+                author: true,
+            },
+        }),
     },
 };
 export const resolvers = { queries, extraResolvers };
