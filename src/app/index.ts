@@ -35,6 +35,8 @@ export async function initServer() {
       ...User.resolvers.Mutation
     },
     Tweet: Tweet.resolvers.Tweet,
+    User: User.resolvers.User,
+
   },
 });
 

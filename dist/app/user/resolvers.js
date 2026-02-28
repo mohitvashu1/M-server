@@ -15,6 +15,16 @@ const queries = {
                     orderBy: { createdAt: "desc" },
                     include: { author: true },
                 },
+                followers: {
+                    include: {
+                        follower: true,
+                    },
+                },
+                following: {
+                    include: {
+                        following: true,
+                    },
+                },
             },
         });
     },
@@ -26,19 +36,29 @@ const queries = {
                     orderBy: { createdAt: "desc" },
                     include: { author: true },
                 },
+                followers: {
+                    include: {
+                        follower: true,
+                    },
+                },
+                following: {
+                    include: {
+                        following: true,
+                    },
+                },
             },
         });
     },
 };
 const mutations = {
     followUser: async (parent, { to }, ctx) => {
-        if (!ctx.user || !ctx.user.id)
+        if (!ctx.user?.id)
             throw new Error("unauthenticated");
         await UserService.followUser(ctx.user.id, to);
         return true;
     },
     unfollowUser: async (parent, { to }, ctx) => {
-        if (!ctx.user || !ctx.user.id)
+        if (!ctx.user?.id)
             throw new Error("unauthenticated");
         await UserService.unfollowUser(ctx.user.id, to);
         return true;
@@ -46,28 +66,34 @@ const mutations = {
 };
 const extraResolvers = {
     User: {
-        tweets: (parent) => prismaClient.tweet.findMany({
-            where: { authorId: parent.id },
-            orderBy: { createdAt: "desc" },
-            include: { author: true },
-        }),
-        followers: async (parent) => {
-            const result = await prismaClient.follows.findMany({
-                where: { following: { id: parent.id } },
-                include: {
-                    follower: true,
-                },
+        tweets: async (parent) => {
+            if (parent.tweets)
+                return parent.tweets;
+            if (!parent?.id)
+                return [];
+            return prismaClient.tweet.findMany({
+                where: { authorId: parent.id },
+                orderBy: { createdAt: "desc" },
+                include: { author: true },
             });
-            return result.map((el) => el.follower);
+        },
+        followers: async (parent) => {
+            const rows = await prismaClient.follows.findMany({
+                where: { followingId: parent.id },
+                include: { follower: true },
+            });
+            return rows
+                .map(row => row.follower)
+                .filter(user => user !== null);
         },
         following: async (parent) => {
-            const result = await prismaClient.follows.findMany({
-                where: { follower: { id: parent.id } },
-                include: {
-                    following: true,
-                },
+            const rows = await prismaClient.follows.findMany({
+                where: { followerId: parent.id },
+                include: { following: true },
             });
-            return result.map((el) => el.following);
+            return rows
+                .map(row => row.following)
+                .filter(user => user !== null);
         },
     },
 };
