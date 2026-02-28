@@ -11,6 +11,8 @@ declare class UserService {
     } | null, null, import("@prisma/client/runtime/library").DefaultArgs, {
         log: "query"[];
     }>;
+    static followUser(from: string, to: string): Promise<void>;
+    static unfollowUser(from: string, to: string): Promise<void>;
 }
 export default UserService;
 //# sourceMappingURL=user.d.ts.map

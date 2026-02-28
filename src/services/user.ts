@@ -64,6 +64,46 @@ class UserService {
   public static getUserById(id: string) {
     return prismaClient.user.findUnique({ where: { id } });
   }
+
+  public static async followUser(from: string, to: string) {
+  if (from === to) {
+    throw new Error("You cannot follow yourself");
+  }
+
+  try {
+    await prismaClient.follows.create({
+      data: {
+        followerId: from,
+        followingId: to,
+      },
+    });
+  } catch (error: any) {
+    
+    if (error.code === "P2002") {
+      return;
+    }
+    throw error;
+  }
+}
+
+  public static async unfollowUser(from: string, to: string) {
+  try {
+    await prismaClient.follows.delete({
+      where: {
+        followerId_followingId: {
+          followerId: from,
+          followingId: to,
+        },
+      },
+    });
+  } catch (error: any) {
+    
+    if (error.code === "P2025") {
+      return;
+    }
+    throw error;
+  }
+}
 }
 
 export default UserService;

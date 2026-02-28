@@ -1,5 +1,4 @@
 import UserService from "../../services/user.js";
-import TweetService from "../../services/tweet.js";
 import { prismaClient } from "../../client/db/index.js";
 const queries = {
     verifyGoogleToken: async (parent, { token }) => {
@@ -32,15 +31,17 @@ const queries = {
     },
 };
 const mutations = {
-    createTweet: async (parent, { payload }, ctx) => {
-        const userId = ctx.user?.id;
-        if (!userId)
-            throw new Error("Unauthorized");
-        return TweetService.createTweet({
-            content: payload.content,
-            imageURL: payload.imageURL,
-            userId,
-        });
+    followUser: async (parent, { to }, ctx) => {
+        if (!ctx.user || !ctx.user.id)
+            throw new Error("unauthenticated");
+        await UserService.followUser(ctx.user.id, to);
+        return true;
+    },
+    unfollowUser: async (parent, { to }, ctx) => {
+        if (!ctx.user || !ctx.user.id)
+            throw new Error("unauthenticated");
+        await UserService.unfollowUser(ctx.user.id, to);
+        return true;
     },
 };
 const extraResolvers = {
@@ -50,6 +51,24 @@ const extraResolvers = {
             orderBy: { createdAt: "desc" },
             include: { author: true },
         }),
+        followers: async (parent) => {
+            const result = await prismaClient.follows.findMany({
+                where: { following: { id: parent.id } },
+                include: {
+                    follower: true,
+                },
+            });
+            return result.map((el) => el.follower);
+        },
+        following: async (parent) => {
+            const result = await prismaClient.follows.findMany({
+                where: { follower: { id: parent.id } },
+                include: {
+                    following: true,
+                },
+            });
+            return result.map((el) => el.following);
+        },
     },
 };
 export const resolvers = {

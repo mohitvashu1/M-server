@@ -6,40 +6,40 @@ export declare const Tweet: {
             getAllTweets: () => Promise<({
                 author: {
                     id: string;
-                    createdAt: Date;
-                    updatedAt: Date;
                     firstName: string;
                     lastName: string | null;
                     email: string;
                     profileImageURL: string | null;
+                    createdAt: Date;
+                    updatedAt: Date;
                 };
             } & {
                 id: string;
+                createdAt: Date;
+                updatedAt: Date;
                 content: string;
                 imageURL: string | null;
                 authorId: string;
-                createdAt: Date;
-                updatedAt: Date;
             })[]>;
         };
         Mutation: {
             createTweet: (parent: any, { payload }: any, ctx: import("../../interface.js").GraphqlContext) => Promise<{
                 author: {
                     id: string;
-                    createdAt: Date;
-                    updatedAt: Date;
                     firstName: string;
                     lastName: string | null;
                     email: string;
                     profileImageURL: string | null;
+                    createdAt: Date;
+                    updatedAt: Date;
                 };
             } & {
                 id: string;
+                createdAt: Date;
+                updatedAt: Date;
                 content: string;
                 imageURL: string | null;
                 authorId: string;
-                createdAt: Date;
-                updatedAt: Date;
             }>;
         };
         Tweet: {};
